@@ -10,7 +10,7 @@ PRODUCT_SOURCE_ROOT_DIRS += -prebuilts/misc/protobuf_vendorcompat
 -include $(sort $(wildcard vendor/*/*/exclude-bp.mk))
 
 PRODUCT_BRAND ?= Project Infinity X
-WITH_GAPPS ?= true
+WITH_GAPPS ?= false
 
 ifeq ($(PRODUCT_GMS_CLIENTID_BASE),)
 PRODUCT_PRODUCT_PROPERTIES += \
@@ -443,6 +443,9 @@ PRODUCT_ENFORCE_RRO_EXCLUDED_OVERLAYS += vendor/crowdin/overlay
 PRODUCT_PACKAGE_OVERLAYS += vendor/crowdin/overlay
 
 PRODUCT_EXTRA_RECOVERY_KEYS += \
+    vendor/infinity/build/target/product/security/lineage
+
+PRODUCT_EXTRA_OTA_KEYS += \
     vendor/infinity/build/target/product/security/lineage
 
 include vendor/infinity/config/version.mk

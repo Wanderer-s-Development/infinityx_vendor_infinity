@@ -11,7 +11,11 @@ then
   DEVICE=$(echo $TARGET_PRODUCT | sed 's/infinity_//g')
   if [ -f $file_path ]; then
     file_size=$(stat -c%s $file_path)
-    version=$(echo "$file_name" | cut -d '-' -f 3)
+    if [[ $file_name == lineage-* ]]; then
+      version=$(echo "$file_name" | cut -d '-' -f 2)
+    else
+      version=$(echo "$file_name" | cut -d '-' -f 3)
+    fi
     aversion="17"
     md5=$(md5sum $file_path | awk '{ print $1 }');
     datetime=$(grep ro\.build\.date\.utc ./out/target/product/$DEVICE/system/build.prop | cut -d= -f2);

@@ -10,7 +10,7 @@ export V=17
 export ADDOND_VERSION=3
 
 # Partitions to mount for backup/restore in V3
-export all_V3_partitions="vendor product system_ext"
+export all_V3_partitions="vendor product system_ext odm"
 
 # Scripts in /system/addon.d expect to find backuptool.functions in /tmp
 mkdir -p /postinstall/tmp/
@@ -56,7 +56,7 @@ if [ ! -r /product/etc/build.prop ] && [ ! -r /system/build.prop ]; then
   echo "Backup/restore is not possible. Partition is probably empty"
   return 1
 fi
-if ! grep -q "^ro.infinity.aversion=$V.*" /product/etc/build.prop /system/build.prop; then
+if ! grep -q -E "^ro\.(infinity\.(aversion|android\.version)|lineage\.build\.version)=$V(\.|$)" /product/etc/build.prop /system/build.prop 2>/dev/null; then
   echo "Backup/restore is not possible. Incompatible ROM version: $V"
   return 2
 fi
@@ -95,7 +95,12 @@ fi
 ### Mount helpers ###
 #####################
 get_block_for_mount_point() {
-  grep -v "^#" /vendor/etc/fstab.$(getprop ro.boot.hardware) | grep "[[:blank:]]$1[[:blank:]]" | tail -n1 | tr -s [:blank:] ' ' | cut -d' ' -f1
+  local fstab="/vendor/etc/fstab.$(getprop ro.boot.hardware)"
+  [ ! -f "$fstab" ] && fstab="/vendor/etc/fstab.default"
+  [ ! -f "$fstab" ] && fstab=$(ls /vendor/etc/fstab.* 2>/dev/null | head -n1)
+  if [ -f "$fstab" ]; then
+    grep -v "^#" "$fstab" | grep "[[:blank:]]$1[[:blank:]]" | tail -n1 | tr -s [:blank:] ' ' | cut -d' ' -f1
+  fi
 }
 
 find_block() {

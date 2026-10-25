@@ -56,7 +56,7 @@ function breakfast()
         else
             # This is probably just the Lineage model name
             if [ -z "$variant" ]; then
-                variant="userdebug"
+                variant="user"
             fi
 
             lunch lineage_$target-$aosp_target_release-$variant
@@ -1024,7 +1024,8 @@ function build_kernel() {
 }
 
 function generate_host_overrides() {
-    export BUILD_USERNAME=android-build
+    export BUILD_USERNAME=Wanderer
+    export WITH_GAPPS=false
     HEX=$(openssl rand -hex 8)
     ALPHA=$(tr -dc 'a-z0-9' < /dev/urandom | head -c 4)
     export BUILD_HOSTNAME="r-${HEX}-${ALPHA}"

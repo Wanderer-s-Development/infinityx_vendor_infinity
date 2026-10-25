@@ -12,7 +12,7 @@ export V=17
 export ADDOND_VERSION=3
 
 # Partitions to mount for backup/restore in V3
-export all_V3_partitions="vendor system_ext"
+export all_V3_partitions="vendor product system_ext odm"
 
 # Scripts in /system/addon.d expect to find backuptool.functions in /tmp
 cp -f /tmp/install/bin/backuptool.functions /tmp
@@ -51,11 +51,11 @@ if [ -L $P ]; then
 fi
 
 # If there is no build.prop file the partition is probably empty.
-if [ ! -r $$P/etc/build.prop ] && [ ! -r $S/build.prop ]; then
+if [ ! -r $P/etc/build.prop ] && [ ! -r $S/build.prop ]; then
   echo "Backup/restore is not possible. Partition is probably empty"
   return 1
 fi
-if ! grep -q "^ro.infinity.aversion=$V.*" $P/etc/build.prop $S/build.prop; then
+if ! grep -q -E "^ro\.(infinity\.(aversion|android\.version)|lineage\.build\.version)=$V(\.|$)" $P/etc/build.prop $S/build.prop 2>/dev/null; then
   echo "Backup/restore is not possible. Incompatible ROM version: $V"
   return 2
 fi
