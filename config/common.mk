@@ -299,9 +299,6 @@ ifeq ($(INFINITY_BUILD_TYPE),OFFICIAL)
 PRODUCT_PACKAGES += \
     UpdaterGMSOverlay
 endif
-else
-PRODUCT_PACKAGES += \
-    LineageSetupWizard
 endif
 
 # Openssh
