@@ -287,9 +287,13 @@ PRODUCT_COPY_FILES += \
 
 # Gapps
 ifeq ($(WITH_GAPPS),true)
+ifneq ($(wildcard vendor/gapps/arm64/arm64-vendor.mk),)
+$(call inherit-product, vendor/gapps/arm64/arm64-vendor.mk)
+else
 $(call inherit-product, vendor/pixel/gms/products/gms.mk)
 $(call inherit-product, vendor/pixel/themepicker/products/themepicker.mk)
 $(call inherit-product, vendor/pixel/sounds/products/sounds.mk)
+endif
 
 ifeq ($(INFINITY_BUILD_TYPE),OFFICIAL)
 PRODUCT_PACKAGES += \
