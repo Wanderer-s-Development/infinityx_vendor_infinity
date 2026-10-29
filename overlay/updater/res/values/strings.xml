@@ -6,9 +6,9 @@
     <string name="list_build_version">Project Infinity-X <xliff:g id="version" example="4.1">%1$s</xliff:g></string>
     <string name="list_build_version_date">Project Infinity-X <xliff:g id="version" example="4.1">%1$s</xliff:g> - <xliff:g id="date" example="July 11, 2017">%2$s</xliff:g></string>
     <string name="header_download_url" translatable="false">projectinfinityx.com</string>
-    <string name="menu_changelog_url" translatable="false">https://projectinfinityx.com</string>
+    <string name="menu_changelog_url" translatable="false">https://raw.githubusercontent.com/Wanderer-s-Development/infinityx-ota/main/changelog.txt</string>
     <string name="report_issue_url" translatable="false">https://github.com/ProjectInfinity-X</string>
     <string name="export_path" translatable="false">Project Infinity-X updates/</string>
-    <string name="updater_server_url" translatable="false">https://raw.githubusercontent.com/ProjectInfinity-X/official_devices/17/vanilla/{device}.json</string>
+    <string name="updater_server_url" translatable="false">https://raw.githubusercontent.com/Wanderer-s-Development/infinityx-ota/main/{device}.json</string>
 
 </resources>
