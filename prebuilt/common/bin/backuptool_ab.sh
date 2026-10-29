@@ -56,7 +56,7 @@ if [ ! -r /product/etc/build.prop ] && [ ! -r /system/build.prop ]; then
   echo "Backup/restore is not possible. Partition is probably empty"
   return 1
 fi
-if ! grep -q -E "^ro\.(infinity\.(aversion|android\.version)|lineage\.build\.version)=$V(\.|$)" /product/etc/build.prop /system/build.prop 2>/dev/null; then
+if ! grep -q -E "^(ro\.(infinity\.(aversion|android\.version)|lineage\.build\.version|build\.version\.release))=$V(\.|$)" /product/etc/build.prop /system/build.prop 2>/dev/null; then
   echo "Backup/restore is not possible. Incompatible ROM version: $V"
   return 2
 fi
@@ -127,17 +127,21 @@ find_block() {
 
   if [ -b "$dev" ]; then
     echo "$dev"
+  elif [ -b "${dev}-snapshot" ]; then
+    echo "${dev}-snapshot"
   fi
 }
 
 DYNAMIC_PARTITIONS=$(getprop ro.boot.dynamic_partitions)
-if [ "$DYNAMIC_PARTITIONS" = "true" ]; then
+if [ -d "/dev/block/mapper" ] || [ "$DYNAMIC_PARTITIONS" = "true" ]; then
+    DYNAMIC_PARTITIONS="true"
     BLK_PATH="/dev/block/mapper"
 else
     BLK_PATH=/dev/block/bootdevice/by-name
 fi
 
 CURRENTSLOT=$(getprop ro.boot.slot_suffix)
+[ -z "$CURRENTSLOT" ] && CURRENTSLOT="_$(getprop ro.boot.slot)"
 if [ ! -z "$CURRENTSLOT" ]; then
   if [ "$CURRENTSLOT" = "_a" ]; then
     # Opposite slot
@@ -150,8 +154,13 @@ fi
 mount_extra() {
   for partition in $@; do
     mnt_point="/postinstall/$partition"
-    mountpoint "$mnt_point" >/dev/null 2>&1 && continue
-    [ -L "$mnt_point" ] && continue
+    if mountpoint >/dev/null 2>&1 "$mnt_point" || grep -q "[[:blank:]]$mnt_point[[:blank:]]" /proc/mounts; then
+      continue
+    fi
+    if [ -L "$mnt_point" ]; then
+      rm -f "$mnt_point"
+    fi
+    mkdir -p "$mnt_point"
 
     blk_dev=$(find_block "$partition")
     if [ -n "$blk_dev" ]; then
@@ -163,10 +172,10 @@ mount_extra() {
 
 umount_extra() {
   for partition in $@; do
-    # Careful with unmounting. If the update has a partition less than the current system,
-    # /postinstall/$partition is a symlink to /system/$partition, which on the active slot
-    # is a symlink to /$partition which is a mountpoint we would end up unmounting!
-    [ ! -L "/postinstall/$partition" ] && umount -l "/postinstall/$partition" 2>/dev/null
+    mnt_point="/postinstall/$partition"
+    if mountpoint >/dev/null 2>&1 "$mnt_point" || grep -q "[[:blank:]]$mnt_point[[:blank:]]" /proc/mounts; then
+      umount -l "$mnt_point" 2>/dev/null
+    fi
   done
 }
 

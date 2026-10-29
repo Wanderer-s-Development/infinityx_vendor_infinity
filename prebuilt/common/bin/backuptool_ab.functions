@@ -63,7 +63,7 @@ get_output_path() {
 __is_on_mounted_partition() {
   for p in $all_V3_partitions; do
     mnt_point="/postinstall/$p"
-    if echo "$1" | grep -q "^$p/" && [ ! -L "$mnt_point" ] && mountpoint >/dev/null 2>&1 "$mnt_point"; then
+    if echo "$1" | grep -q "^$p/" && (mountpoint >/dev/null 2>&1 "$mnt_point" || grep -q "[[:blank:]]$mnt_point[[:blank:]]" /proc/mounts); then
       return 0
     fi
   done
